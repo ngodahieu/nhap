@@ -608,20 +608,10 @@ const questions = shuffleWithSeed(originalQuestions, seed);
 document.getElementById("welcome").innerText = "Mã học sinh: " + studentID;
 
 const quizDiv = document.getElementById("quiz");
+const passageArea = document.getElementById("passageArea"); // ✅ thêm dòng này
 
 questions.forEach((group, groupIndex) => {
 
-const passageArea = document.getElementById("passageArea");
-
-if (group.passage) {
-  const passageDiv = document.createElement("div");
-  passageDiv.innerHTML = `
-    <p><b>📄 Tư liệu:</b></p>
-    ${group.passage}
-    <hr>
-  `;
-  passageArea.appendChild(passageDiv);
-}
   // 🔥 XÁO TRỘN CÂU TRONG GROUP
 const shuffledQuestions = shuffleWithSeed(group.questions, seed + groupIndex);
 
@@ -693,6 +683,10 @@ else {
 });
   createQuestionNav(); // ✅ đúng vị trí
   updateProgress();
+  // 🔥 THÊM NGAY DƯỚI ĐÂY
+passageArea.innerHTML = passageMap[0]
+  ? `<b>📄 Tư liệu:</b><br>${passageMap[0]}`
+  : "<i>Không có tư liệu</i>";
   // 🔥 THÊM Ở ĐÂY
   const passageArea = document.getElementById("passageArea");
 passageArea.innerHTML = passageMap[0]
