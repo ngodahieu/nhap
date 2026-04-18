@@ -899,10 +899,7 @@ quizDiv.addEventListener("scroll", () => {
   let currentIndex = 0;
 
   questions.forEach((q, index) => {
-    const rect = q.getBoundingClientRect();
-    const parentRect = quizDiv.getBoundingClientRect();
-
-    if (rect.top < parentRect.top + parentRect.height / 2) {
+    if (q.offsetTop - quizDiv.scrollTop < quizDiv.clientHeight / 2) {
       currentIndex = index;
     }
   });
@@ -912,10 +909,6 @@ quizDiv.addEventListener("scroll", () => {
     : "<i>Không có tư liệu</i>";
 });
 
-  passageArea.innerHTML = passageMap[currentIndex]
-    ? `<b>📄 Tư liệu:</b><br>${passageMap[currentIndex]}`
-    : "<i>Không có tư liệu</i>";
-});
   // chặn copy
 document.addEventListener("copy", e => {
   e.preventDefault();
