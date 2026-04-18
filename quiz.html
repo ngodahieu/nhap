@@ -603,6 +603,7 @@ function shuffleWithSeed(array, seed) {
 const seed = getSeedFromString(studentID);
 const questions = shuffleWithSeed(originalQuestions, seed);
   let finalQuestions = [];
+  let passageMap = [];
 
 document.getElementById("welcome").innerText = "Mã học sinh: " + studentID;
 
@@ -628,6 +629,7 @@ shuffledQuestions.forEach((q, index) => {
 
   const qIndex = finalQuestions.length; // index thật
   finalQuestions.push(q); // lưu thứ tự chuẩn
+  passageMap[qIndex] = group.passage || "";
 
   const saved = localStorage.getItem("q" + qIndex);
 
@@ -691,6 +693,10 @@ else {
 });
   createQuestionNav(); // ✅ đúng vị trí
   updateProgress();
+  // 🔥 THÊM Ở ĐÂY
+passageArea.innerHTML = passageMap[0]
+  ? `<b>📄 Tư liệu:</b><br>${passageMap[0]}`
+  : "<i>Không có tư liệu</i>";
   function saveMulti(qIndex, value, checked) {
   let arr = JSON.parse(localStorage.getItem("q" + qIndex) || "[]");
 
@@ -895,6 +901,25 @@ const countdown = setInterval(() => {
   }
 
 }, 1000);
+  const passageArea = document.getElementById("passageArea");
+
+window.addEventListener("scroll", () => {
+  const questions = document.querySelectorAll(".question");
+
+  let currentIndex = 0;
+
+  questions.forEach((q, index) => {
+    const rect = q.getBoundingClientRect();
+
+    if (rect.top < window.innerHeight / 2) {
+      currentIndex = index;
+    }
+  });
+
+  passageArea.innerHTML = passageMap[currentIndex]
+    ? `<b>📄 Tư liệu:</b><br>${passageMap[currentIndex]}`
+    : "<i>Không có tư liệu</i>";
+});
   // chặn copy
 document.addEventListener("copy", e => {
   e.preventDefault();
