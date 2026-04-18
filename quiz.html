@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Làm bài</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+  background: linear-gradient(135deg, #020617, #0f172a);
+  min-height: 100vh;
+  overflow-y: auto;        /* 🔥 đổi */
+  padding-top: 40px;       /* 🔥 thêm cho đẹp */
+}
+
+    #particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* KHUNG BÀI LÀM */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: white;
+      color: black;
+      padding: 30px;
+      border-radius: 20px;
+      border: 3px solid #3b82f6;
+      box-shadow: 0 0 25px rgba(59,130,246,0.4);
+      animation: fadeIn 0.8s ease;
+      margin: 0 auto; /* 🔥 THÊM DÒNG NÀY */
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: #1e3a8a;
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+
+    input[type="radio"] {
+      margin-right: 8px;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #1e3a8a;
+    }
+    #timer {
+  position: fixed; /* luôn đứng yên */
+  top: 20px;
+  right: 20px;
+  background: white;
+  color: #1e3a8a;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 0 15px rgba(59,130,246,0.4);
+  z-index: 999;
+  transition: 0.3s;
+}
+
+/* khi sắp hết giờ */
+.timer-danger {
+  color: red !important;
+  border-color: red !important;
+  box-shadow: 0 0 15px red !important;
+}
+    #progressText {
+  margin: 10px 0;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+#progressBar {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+#progressFill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #3b82f6, #1e3a8a);
+  transition: 0.3s;
+}
+#progressWrapper {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 220px;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 15px rgba(59,130,246,0.4);
+  z-index: 999;
+}
+/* NAV THU GỌN */
+#questionNav {
+  position: fixed;
+  top: 120px;
+  right: -220px; /* 🔥 ẩn ra ngoài */
+  width: 180px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 20px rgba(59,130,246,0.5);
+  z-index: 9999;
+  transition: right 0.3s ease;
+}
+
+/* khi mở */
+#questionNav.open {
+  right: 20px;
+}
+
+/* NÚT MỞ */
+#toggleNav {
+  position: fixed;
+  top: 120px;
+  right: 20px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  z-index: 10000;
+  font-size: 14px;
+}
+
+.q-box {
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #3b82f6;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.q-box:hover {
+  background: #dbeafe;
+}
+
+.q-done {
+  background: #22c55e; /* xanh lá */
+  color: white;
+}
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+
+<body>
+<div id="toggleNav">☰</div>
+<div id="particles"></div>
+<div id="timer">90:00</div>
+<div id="questionNav"></div>
+  <div id="progressText">Đã làm: 0/0 câu</div>
+<div id="progressBar">
+  <div id="progressFill"></div>
+</div>
+<div class="container">
+
+  <h2 id="welcome"></h2>
+  
+
+  <div id="quiz"></div>
+
+  <button onclick="submitTest()">Nộp bài</button>
+
+  <div id="result"></div>
+
+</div>
+
+<script>
+const originalQuestions = [
+  {
+    passage: `Cho đoạn tư liệu sau và <b> Thí sinh trả lời 3 câu hỏi bên dưới đây</b>: <br>
+Một nhóm học sinh nghiên cứu ảnh hưởng của pH dung dịch đến sức điện động của pin Galvani Zn - Cu. Giả thuyết được đưa ra là: "Khi thay đổi pH của dung dịch muối sẽ thay đổi sức điện động của pin điện". Nhóm học sinh đó tiến hành thí nghiệm như sau ở 25<sup>o</sup>C: <br>
+
+<b><i>Thí nghiệm 1:</i></b> Lấy thanh Zn nhúng vào cốc 1 đựng 400 mL dung dịch ZnSO<sub>4</sub> 1,25M và thanh Cu nhúng vào cốc 2 chứa 400 mL dung dịch CuSO<sub>4</sub> 1,25M, thêm nước cất vào cả hai cốc để thành 500 mL dung dịch. Nối hai dung dịch với nhau bằng cầu muối KCl nhão và hai thanh kim loại với một vôn kế như hình vẽ sau: <br>
+
+<img src='images/pin zn-cu.png' style="width: 100%; max-width: 500px;"> <br>
+Để hệ thống ổn định khoảng 2 phút và ghi lại số chỉ vôn kế và được giá trị là 1,10 V. Lặp lại các bước như thí nghiệm 1 nhưng thay nước cất ở một trong hai cốc bằng dung dịch H<sub>2</sub>SO<sub>4</sub> 2M. Cụ thể: <br>
+<b><i>Thí nghiệm 2:</i></b> thay nước cất ở cốc 1 bằng 100 mL dung dịch H<sub>2</sub>SO<sub>4</sub> 2M, thì số chỉ vôn kế là 1,07 V. <br>
+<b><i>Thí nghiệm 3:</i></b> thay nước cất ở cốc 2 bằng 100 mL dung dịch H<sub>2</sub>SO<sub>4</sub> 2M, thì số chỉ vôn kế là 1,12 V.`,
+
+    questions: [
+      {
+        question: "Trong Thí nghiệm 1, nồng độ mol của dung dịch ZnSO<sub>4</sub> và CuSO<sub>4</sub> sau khi pha loãng bằng nước cất là bao nhiêu?",
+        options: ["A. 1,56M.", "B. 1,25M.", "C. 0,8M.", "D. 1,00M."],
+        answer: 3
+      },
+      {
+        question: `Cho các phát biểu sau: <br>
+(1) Dựa trên hình vẽ và nguyên lý hoạt động của pin Galvani Zn−Cu, thanh Zn đóng vai trò là anode và xảy ra quá trình oxi hóa. <br>
+(2) Việc thêm dung dịch H<sub>2</sub>SO<sub>4</sub> vào cốc 2 (Thí nghiệm 3) làm giảm sức điện động của pin so với Thí nghiệm 1. <br>
+(3) Trong các thí nghiệm trên, cầu muối KCl có vai trò chính là duy trì sự trung hòa điện tích giữa hai dung dịch. <br>
+(4) Sự thay đổi sức điện động giữa Thí nghiệm 2 và Thí nghiệm 3 chứng minh giả thuyết ban đầu là đúng vì pH ảnh hưởng đến pin. <br>
+(5) Trong Thí nghiệm 1, dòng electron sẽ di chuyển từ thanh Cu sang thanh Zn thông qua dây dẫn. <br>
+Số phát biểu SAI là:`,
+options: ["A. 3.", "B. 5.", "C. 2.", "D. 1."],
+answer: 2
+      },
+      {
+        question: "Nồng độ mol của H<sub>2</sub>SO<sub>4</sub> trong dung dịch tại cốc 1 của Thí nghiệm 2 là bao nhiêu?",
+        options: ["A. 2,00M.", "B. 0,40M.", "C. 0,50M.", "D. 0,20M."],
+        answer: 1
+      },
+    ]
+  },
+  {
+    passage:"",
+    questions: [
+  {
+  question: `Muối Mohr là một muối kép ngậm nước được tạo thành từ hỗn hợp cùng số mol theo phương trình: <br>
+  <center> FeSO<sub>4</sub>.7H<sub>2</sub>O + (NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub> → FeSO<sub>4</sub>.(NH<sub>4</sub>)<sub>2</sub>SO<sub>4</sub>.6H<sub>2</sub>O + H<sub>2</sub>O </center> <br>
+  Cho độ tan của muối Mohr ở 20°C là 26,9 gam/100 gam H2O và ở 80°C là 73,0 gam/100 gam H<sub>2</sub>O. 
+  Tính khối lượng của muối FeSO<sub>4</sub>.7H<sub>2</sub>O (gam) cần thiết để tạo thành dung dịch muối 
+  Mohr bão hòa 80°C, sau khi làm nguội dung dịch này xuống 20°C để thu được 100 gam muối Mohr tinh thể 
+  và dung dịch bão hòa. Giả thiết trong quá trình kết tinh nước bay hơi không đáng kể (làm tròn đến hàng đơn vị) <br>
+  <b>Cho khối lượng mol của Fe = 56, S = 32, O = 16, N = 14, H = 1.</b>`,
+  type: "short",
+  answer: "112"
+},
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+  {
+        question: `Cho biết:E°<sub>Al<sup>3+</sup>/Al</sub> = −1,676 V; E°<sub>Zn<sup>2+</sup>/Zn</sub> = −0,763 V ; E°<sub>Pb<sup>2+</sup>/Pb</sub> = −0,126 V; 
+        E°<sub>Cu<sup>2+</sup>/Cu</sub> = +0,340 V. <br>
+        Trong các pin điện hoá sau, pin nào có sức điện động chuẩn lớn nhất?`,
+        options: ["A. Pin Zn-Pb.", "B. Pin Pb-Cu.", "C. Pin Zn-Cu.", "D. Pin Al-Zn."],
+        answer: 2
+      },
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+  {
+        question: `Sự gia tăng nồng độ của carbon dioxide trong nước biển thì các rạn san hô, núi đá vôi có thể bị phá
+hủy, xói mòn. Hiện tượng này được giải thích bằng phương trình hóa học nào sau đây?`,
+        options: ["A. CaCO<sub>3 (s)</sub> + H<sub>2</sub>O <sub>(l)</sub> + CO<sub>2 (aq)</sub> &longrightarrow; Ca(HCO<sub>3</sub>)<sub>2 (aq)</sub> .", 
+                  "B. CaCO<sub>3 (s)</sub> + H<sub>2</sub>O <sub>(l)</sub> + CO<sub>2 (s)</sub> &longrightarrow; Ca(HCO<sub>3</sub>)<sub>2 (aq)</sub> .", 
+                  "C. MgCO<sub>3 (s)</sub> + H<sub>2</sub>O <sub>(l)</sub> + CO<sub>2 (s)</sub> &longrightarrow; Mg(HCO<sub>3</sub>)<sub>2 (aq)</sub>.", 
+                  "D. Ca(HCO<sub>3</sub>)<sub>2 (aq)</sub> &longrightarrow; CaCO<sub>3 (s)</sub> + H<sub>2</sub>O <sub>(l)</sub> + CO<sub>2 (aq)</sub>."],
+        answer: 0
+      },
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+  {
+        question: `Hợp kim là vật liệu kim loại có chứa một kim loại cơ bản và một số kim loại khác hoặc phi kim.
+Nhận định nào sau đây về hợp kim là không đúng?`,
+        options: ["A. Hơp kim được sử dụng phổ biến của sắt là gang và thép.", 
+                  "B. Tính chất của hợp kim phụ thuộc vào thành phần các đơn chất tham gia cấu tạo mạng tinh thể hợp kim .", 
+                  "C. Hợp kim có nhiều tính chất cơ học, tính chất vật lí vượt trội so với kim loại.", 
+                  "D. Hợp kim có tính chất hóa học khác xa so với tính chất hóa học của các kim loại thành phần."],
+        answer: 3
+      },
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+  {
+        question: `Trong nước, thế điện cực chuẩn của kim loại M<sup>2+</sup>/ M càng lớn thì dạng khử có tính khử ....(1).... dạng oxi hoá có tính oxi hoá ...(2).... Cụm từ cần điền vào (1) và (2) lần lượt là`,
+        options: ["A. càng yếu và càng yếu.", "B. càng mạnh và càng mạnh.", "C. càng yếu và càng mạnh.", "D. càng mạnh và càng yếu."],
+        answer: 2
+      },
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+  {
+        question: `Công thức hóa học của thạch cao sống là`,
+        options: ["A. CuSO<sub>4</sub>.2H<sub>2</sub>O.", "B. 2CaSO<sub>4</sub>.H<sub>2</sub>O.", "C. CaSO<sub>4</sub>.2H<sub>2</sub>O.", 
+                  "D. CaSO<sub>3</sub>.2H<sub>2</sub>O."],
+        answer: 2
+      },
+  ]
+  },
+  {
+  passage:"",
+  questions: [
+    {
+  question: `Điện phân dung dịch NaCl để điều chế Cl<sub>2</sub> và NaOH là một trong những quá trình điện phân
+quan trọng trong công nghiệp. Trong thực tế, người ta điện phân dung dịch NaCl bão hòa có nồng độ
+300 g.L<sup>-1</sup> với điện cực trơ, có màng ngăn điện cực. Sau một thời gian điện phân, nồng độ dung dịch
+NaCl tại anode giảm xuống đến mức 200 g.L<sup>-1</sup> gọi là “nước muối nghèo” và được đưa ra khỏi bể điện
+phân, đồng thời dung dịch NaCl bão hoà mới sẽ được bổ sung vào để tiếp tục quá trình điện phân
+(Xem sơ đồ bên dưới). <br>
+Một trong những nguyên nhân được giải thích cho việc đưa “nước muối nghèo” ra khỏi bể điện phân
+là nếu tiếp tục điện phân với “nước muối nghèo” thì sẽ xảy ra sự oxi hóa H<sub>2</sub>O, làm giảm hiệu suất
+điện phân. <br> <img src='images/dienphannacl.png' style="width: 100%; max-width: 500px;"> <br>
+<b><i> Thí sinh tích vào ô có phát biểu đúng, lưu ý khi đã tích sẽ không được sửa </i></b>
+`,
+  type: "multi",
+  options: [
+    "(1) Khi điện phân dung dịch NaCl, ở anode có sự khử anion chloride thành khí chlorine.",
+    "(2) Màng ngăn xốp có vai trò ngăn cản anion OH<sup>-</sub> di chuyển sang anode phản ứng với Cl<sub>2</sub>.",
+    "(3) Với mỗi lít nước muối bão hoà ban đầu, khi điện phân đến nồng độ “nước muối nghèo” thì sẽ thu được 54,7 gam NaOH, biết hiệu suất chuyển hóa NaCl thành NaOH là 90%.",
+    "(4) Nếu tiếp tục điện phân với nước muối nghèo thì ở anode sẽ có khí oxygen thoát ra."
+  ],
+  answer: [1, 3] // 🔥 các đáp án đúng
+    }
+    ]
+},
+  {
+    passage:"",
+    questions: [
+  {
+  question: `Trong công nghiệp, lượng lớn soda được sản xuất theo phương pháp Solvay theo sơ đồ sau: <br>
+  <img src='images/sodosanxuatsolvay.png' style="width: 100%; max-width: 500px;"> <br>
+  NaHCO<sub>3</sub> đươc tạo thành từ “tháp carbonate hóa” được làm lạnh, lọc rồi đem phân hủy một phần tạo
+thành soda theo phương trình hóa học (1) như sau: <br>
+<center>(1) 2NaHCO<sub>3 (s)</sub> <div style="display:flex; flex-direction:column; align-items:center;">
+  <span style="font-size:14px;">t°</span>
+  <span style="font-size:20px;">⟶</span>
+</div> Na<sub>2</sub>CO<sub>3 (s)</sub> + CO<sub>2 (g)</sub> + H<sub>2</sub>O <sub>(g)</sub></center> <br>
+Phản ứng (1) là phản ứng thu nhiệt. Lượng nhiệt này được cung cấp từ quá trình đốt cháy hoàn toàn than cốc theo phương trình hóa học (2): <br>
+<center>(2) C <sub>(s)</sub> + O<sub>2(g)</sub> &longrightarrow; CO<sub>2(g)</sub></center><br>
+Biết phản ứng (2) đã đốt cháy hoàn toàn 12 tấn than cốc và có 22% nhiệt lượng tỏa ra được cung cấp
+cho phản ứng (1). Từ các quá trình trên thu được loại soda có độ tinh khiết 98,56% theo khối lượng.
+Tính khối lượng soda sản xuất được (theo đơn vị tấn, làm tròn phép tính cuối cùng đến hàng đơn vị). <br>
+Cho biết hiệu suất hấp thụ nhiệt của phản ứng (1) là 100% và các giá trị nhiệt tạo thành chuẩn
+(Δ<sub>f</sub>H°<sub>298</sub> ) của các chất ở điều kiện chuẩn được cho trong bảng sau: <br>
+<img src='images/nhiettaothanh1.png' style="width: 100%; max-width: 500px;"> <br>
+<b>Cho khối lượng mol của Na = 23, H = 1, O = 16, C = 12.<b>
+  `,
+  type: "short",
+  answer: "72"
+},
+  ]
+  },
+{
+    passage:"",
+    questions: [
+  {
+        question: `Trong số các phương pháp làm mềm nước cứng, phương pháp nào chỉ làm mềm được nước có tính
+cứng tạm thời?`,
+        options: ["A. Phương pháp cất nước.", "B. Phương pháp trao đổi ion.", "C. Phương pháp hóa học.", 
+                  "D. Phương pháp đun sôi nước."],
+        answer: 3
+      },
+  ]
+  },
+{
+    passage:`Cho đoạn tư liệu sau và <b> Thí sinh trả lời 2 câu hỏi bên dưới đây</b>: <br>
+    Một nhóm học sinh nghiên cứu các hợp chất của một kim loại kiềm và kiềm thổ thông qua chuỗi phản ứng hóa học. 
+    Khi đốt cháy kim loại này trong ngọn lửa đèn cồn, ngọn lửa có màu tím đặc trưng. Kim loại phản ứng mạnh với nước 
+    tạo dung dịch base và khí. Dung dịch base này có thể phản ứng với khí carbon dioxide tạo ra các muối khác nhau tùy theo tỉ lệ phản ứng. <br>
+Ngoài ra, một số muối thu được có thể tiếp tục phản ứng với acid mạnh để tạo kết tủa trắng không tan trong nước, 
+đồng thời giải phóng khí CO₂. Các phản ứng này được ứng dụng để nhận biết ion kim loại và phân biệt các loại muối carbonate, hydrocarbonate 
+trong phòng thí nghiệm. <br>
+<b> Đây là các phản ứng hóa học mà nhóm học sinh đó đã làm với các hợp chất kiềm và kiềm thổ:</b> <br>
+<center>(1)  2X + 2H<sub>2</sub>O &longrightarrow; 2X<sub>1</sub> + X<sub>2</sub> + H<sub>2</sub>. <br>	(2) 2X<sub>1</sub> + X<sub>2</sub> &longrightarrow; X + X<sub>3</sub> + H<sub2</sub>O.</center> <br>
+<center>(3)  X<sub>1</sub> + CO<sub>2</sub> &longrightarrow; X<sub>4</sub> + H<sub>2</sub>O. <br>		(4) 2X<sub>1</sub> + CO<sub>2</sub> &longrightarrow; X<sub>5</sub>. </center><br>
+<center>(5)  X<sub>5</sub> + X<sub>6</sub> &longrightarrow; X<sub>7</sub> + X<sub>1</sub> + H<sub>2</sub>O. <br>	(6)  2X<sub>5</sub> + X<sub>6</sub> &longrightarrow; X<sub>7</sub> + X<sub>4</sub> + 2H<sub>2</sub>O. </center><br>
+<center>(7)  X<sub>7</sub> + CO<sub>2</sub> + H<sub>2</sub>O &longrightarrow; X<sub>8</sub>. <br>		(8) X<sub>8</sub> + 2X<sub>9</sub> &longrightarrow; BaSO<sub>4</sub> + X<sub>10</sub> + 2CO<sub>2</sub> + 2H<sub>2</sub>O. </center><br>
+Bên cạnh đó, nhóm học sinh cũng tìm hiểu về màu sắc của các ngọn lửa khi cho hợp chất của kim loại kiềm vào ngọn lửa đèn cồn. Kết quả thu được: <br>
+<img src='images/ngonlua1.png' style="width: 100%; max-width: 500px;"> <br>
+<i>Theo thứ tự từ trái sang phải của màu ngọn lửa các ngọn lửa được đánh số thứ tự lần lượt là (1), (2) và (3).
+`,
+    questions: [
+  {
+        question: `Kim loại X trong tư liệu trên là kim loại nào?`,
+        options: ["A. Sodium.", "B. Potassium.", "C. Calcium.", 
+                  "D. Barium."],
+        answer: 1
+      },
+    {
+        question: `Cho các phát biểu sau: <br>
+        (1) Nhúng đầu que đốt bằng platium đã được rửa sạch bằng nước vào dung dịch lithium chloride bão hoà rồi đưa lên ngọn lửa đèn khí sẽ thấy ngọn lửa có màu giống màu số (2) trong bức ảnh. <br>
+        (2) Ở phản ứng (2), chất X<sub>3</sub> có tính tẩy rửa mạnh như NaClO do có tính oxi hóa mạnh. <br>
+        (3) X<sub>4</sub> là muối hydrogencarbonate, còn X<sub>5</sub> là muối carbonate. <br>
+        (4) Phản ứng (8) tạo kết tủa BaSO<sub>4</sub> chứng tỏ X<sub>9</sub> là BaCl<sub>2</sub> hoặc Ba(NO<sub>3</sub>)<sub>2</sub>. <br>
+        Số phát biểu đúng là:`,
+        options: ["A. 1.", "B. 2.", "C. 3.", "D. 4."],
+        answer: 1
+      },
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+  {
+        question: `Hợp kim của sắt trong đó nguyên tố carbon chiếm 0,01% - 2% và có một lượng nhỏ các nguyên tố Cr, Mn, Si… được gọi là?`,
+        options: ["A. thép.", "B. hematite.", "C. gang.", 
+                  "D. pyrite."],
+        answer: 0
+      },
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+{
+  question: `Một gói làm nóng thức ăn (FRH) chứa 8 gam hỗn hợp (Mg 90%, Fe 4%, NaCl 6% về khối lượng), khi tiếp xúc với nước sẽ xảy ra phản ứng: <br>
+  <center> Mg<sub>(s)</sub> + 2H<sub>2</sub>O<sub>(l)</sub> ⟶ Mg(OH)<sub>2 (s)</sub> + H<sub>2 (g)</sub></center> <br>
+  Phản ứng này tỏa ra nhiều nhiệt và làm nóng phần thức ăn đi kèm.<br>
+  <i>Cho biết:</i> Enthalpy tạo thành chuẩn (kJ.mol<sup>-1</sup>) của Mg(OH)<sub>2 (s)</sub> và H<sub>2</sub>O <sub>l</sub> lần lượt là -928,40 và -285,80. <br>
+  Biết lượng nhiệt mà nước nhận được để thay đổi Δt(°C) được tính theo công thức Q=m.c.Δt. <br>
+  Phần nước được làm nóng chỉ nhận được 60% lượng nhiệt tỏa ra. Nếu sử dụng gọi FRH để làm nóng 250mL nước từ 25°C lên t°C thì t có giá trị tối đa là bao nhiêu? <br>
+  <i> Cho biết nhiệt dung riêng của nước là C=4,2 J.g<sup>-1</sup>.K<sup>-1</sup>; khối lượng riêng của nước là D=1g/mL.</i> Khối lượng mol của Mg = 24, H = 1, O = 16, Na = 23, Fe = 56, Cl = 35,5`,
+  type: "short",
+  answer: "86,2"
+      },
+  ]
+  },
+
+  {
+    passage:"",
+    questions: [
+  {
+        question: `Điện phân dung dịch chất X thu được hỗn hợp gồm hydroxide khi Y và khí hydrogen. Biết khi đem chất X cho vào ngọn lửa đèn cồn thì thu được ngọn lửa có màu vàng. Hãy cho biết khí Y có màu gì?`,
+        options: ["A. Xanh lục.", "B. Vàng nhạt.", "C. Đỏ nâu.", 
+                  "D. Tím than."],
+        answer: 1
+      },
+  ]
+  },
+ {
+    passage:"",
+    questions: [
+  {
+        question: `Trong phòng thí nghiệm, dung dịch chất nào sau đây phù hợp để kiểm tra sự có mặt của ion SO<sub>4</sub><sup>2–</sup>
+(aq)?`,
+        options: ["A. NaCl.", "B. NaNO<sub>3</sub>.", "C. BaCl<sub>2</sub>.", 
+                  "D. KCl."],
+        answer: 2
+      },
+  ]
+  },
+  {
+    passage:"",
+    questions: [
+{
+  question: `Trong công nghiệp, nhôm được sản xuất từ quặng bauxite theo 2 giai đoạn chính : <br>
+  <b>• Giai đoạn 1:</b> Tinh chế quặng bauxite. <br>
+  <b>• Giai đoạn 2: </b> Điện phân Al<sub>2</sub>O<sub>3</sub> nóng chảy (Al<sub>2</sub>O<sub>3</sub> được trộn cùng với cryolite).<br>
+  Sản phẩm điện phân ở cathode là nhôm (lỏng) và ở anode là hỗn hợp khí CO2, CO, O2. Cấu tạo bể điện phân
+như hình sau : <br>
+<center> <img src='images/dpal.png' style="width: 100%; max-width: 500px;"> </center> <br>
+Sau một thời gian điện phân thu được m tấn Al và hỗn hợp khí X (gồm CO<sub>2</sub>, CO và O<sub>2</sub> có tỉ lệ về thể
+tích là 7 : 2 : 1 trong cùng điều kiện). Giả thiết không có thêm sản phẩm nào được sinh ra trong quá trình
+điện phân. Biết rằng khối lượng carbon bị oxi hóa trên anode là 2,7 tấn. Giá trị của m là bao nhiêu tấn? (làm tròn kết quả đến hàng phần chục) <br>
+<i> Cho khối lượng mol Al = 27, C = 12, O = 16. </i>
+`,
+  type: "short",
+  answer: "8,1"
+      },
+  ]
+  },
+{
+  passage:"",
+  questions: [
+    {
+  question: `Thực hiện thí nghiệm cho dung dịch NH<sub>3</sub> vào ống nghiệm đựng bột Ni(OH)<sub>2</sub> màu xanh lá cây đến dư,
+thu được phức chất bát diện chỉ chứa phối tử NH3 có màu xanh dưong. <b> Thí sinh chọn vào ô phát biểu sai.</b>
+`,
+  type: "multi",
+  options: [
+    "(1) Phức chất [Ni(NH<sub>3</sub>)<sub>6</sub>]<sup>2+</sup> được tạo thành.",
+    "(2) Dấu hiệu nhận biết phức chất tạo thành là kết tủa màu xanh lá cây bị tan ra.",
+    "(3) Phức chất thu được chứa bốn phối tử NH<sub>3</sub>.",
+    "(4) Phức chất thu được có nguyên tử trung tâm là Ni<sup>2+</sup>."
+  ],
+  answer: [2] // 🔥 các đáp án sai
+    }
+    ]
+},
+];
+const studentID = localStorage.getItem("studentID");
+
+if (!studentID) {
+  alert("Chưa đăng nhập!");
+  window.location.href = "login.html";
+}
+
+function seededRandom(seed) {
+  let x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function getSeedFromString(str) {
+  return str.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+}
+
+function shuffleWithSeed(array, seed) {
+  let arr = [...array];
+  let currentIndex = arr.length;
+
+  while (currentIndex !== 0) {
+    let randomIndex = Math.floor(seededRandom(seed++) * currentIndex);
+    currentIndex--;
+
+    [arr[currentIndex], arr[randomIndex]] = [
+      arr[randomIndex], arr[currentIndex]
+    ];
+  }
+
+  return arr;
+}
+
+const seed = getSeedFromString(studentID);
+const questions = shuffleWithSeed(originalQuestions, seed);
+  let finalQuestions = [];
+
+document.getElementById("welcome").innerText = "Mã học sinh: " + studentID;
+
+const quizDiv = document.getElementById("quiz");
+
+questions.forEach((group, groupIndex) => {
+
+  if (group.passage) {
+    const passageDiv = document.createElement("div");
+    passageDiv.innerHTML = `<p><b>📄 Tư liệu:</b> ${group.passage}</p><hr>`;
+    quizDiv.appendChild(passageDiv);
+  }
+  // 🔥 XÁO TRỘN CÂU TRONG GROUP
+const shuffledQuestions = shuffleWithSeed(group.questions, seed + groupIndex);
+
+shuffledQuestions.forEach((q, index) => {
+
+  const qIndex = finalQuestions.length; // index thật
+  finalQuestions.push(q); // lưu thứ tự chuẩn
+
+  const saved = localStorage.getItem("q" + qIndex);
+
+  const div = document.createElement("div");
+div.classList.add("question");
+
+if (q.type === "short") {
+  const savedText = localStorage.getItem("q" + qIndex) || "";
+
+  div.innerHTML = `
+    <p><b>Câu ${qIndex + 1}:</b> ${q.question}</p>
+    <input type="text"
+      value="${savedText}"
+      placeholder="Nhập câu trả lời..."
+      oninput="saveAnswer(${qIndex}, this.value)"
+      style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+  `;
+}
+
+else if (q.type === "multi") {
+  let savedArr;
+
+try {
+  savedArr = JSON.parse(localStorage.getItem("q" + qIndex));
+  if (!Array.isArray(savedArr)) savedArr = [];
+} catch {
+  savedArr = [];
+}
+
+  div.innerHTML = `
+    <p><b>Câu ${qIndex + 1}:</b> ${q.question}</p>
+    ${q.options.map((opt, i) => `
+      <label>
+        <input type="checkbox"
+  ${savedArr.includes(i) ? "checked disabled" : ""}
+  onchange="saveMulti(${qIndex}, ${i}, this.checked)">
+        ${opt}
+      </label>
+    `).join("")}
+  `;
+}
+
+else {
+  const saved = localStorage.getItem("q" + qIndex);
+
+  div.innerHTML = `
+    <p><b>Câu ${qIndex + 1}:</b> ${q.question}</p>
+    ${q.options.map((opt, i) => `
+      <label>
+        <input type="radio" name="q${qIndex}" value="${i}"
+          ${saved == i ? "checked" : ""}
+          onchange="saveAnswer(${qIndex}, ${i})">
+        ${opt}
+      </label>
+    `).join("")}
+  `;
+}
+  quizDiv.appendChild(div);
+});
+
+});
+  createQuestionNav(); // ✅ đúng vị trí
+  updateProgress();
+  function saveMulti(qIndex, value, checked) {
+  let arr = JSON.parse(localStorage.getItem("q" + qIndex) || "[]");
+
+  if (checked) {
+    if (!arr.includes(value)) arr.push(value);
+  } else {
+    arr = arr.filter(v => v !== value);
+  }
+
+  localStorage.setItem("q" + qIndex, JSON.stringify(arr));
+  updateProgress();
+}
+
+function saveAnswer(qIndex, value) {
+  localStorage.setItem("q" + qIndex, value);
+  updateProgress(); // 🔥 thêm dòng này
+}
+function createQuestionNav() {
+  const nav = document.getElementById("questionNav");
+  nav.innerHTML = "";
+
+  finalQuestions.forEach((q, index) => {
+    const box = document.createElement("div");
+    box.classList.add("q-box");
+    box.innerText = index + 1;
+
+    // click → nhảy tới câu
+box.onclick = () => {
+  const questions = document.querySelectorAll(".question");
+
+  if (questions[index]) {
+    questions[index].scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+
+  nav.classList.remove("open"); // 🔥 auto đóng
+};
+
+    nav.appendChild(box);
+  });
+
+  updateNav();
+}
+function updateProgress() {
+  let answered = 0;
+
+  finalQuestions.forEach((q, index) => {
+    if (localStorage.getItem("q" + index) !== null) {
+      answered++;
+    }
+  });
+
+  const total = finalQuestions.length;
+
+  document.getElementById("progressText").innerText =
+    `Đã làm: ${answered}/${total} câu`;
+
+  document.getElementById("progressFill").style.width =
+    (answered / total) * 100 + "%";
+
+  updateNav(); // 🔥 thêm dòng này
+}
+  function updateNav() {
+  const boxes = document.querySelectorAll(".q-box");
+
+  boxes.forEach((box, index) => {
+    if (localStorage.getItem("q" + index) !== null) {
+      box.classList.add("q-done");
+    } else {
+      box.classList.remove("q-done");
+    }
+  });
+}
+function submitTest() {
+  clearInterval(countdown);
+  localStorage.removeItem("startTime_" + studentID);
+
+  let score = 0;
+  let answers = [];
+  let wrongAnswers = []; // ✅ lưu câu sai + chưa làm
+
+  finalQuestions.forEach((q, index) => {
+    const selected = localStorage.getItem("q" + index);
+
+    answers.push(selected ?? "");
+
+    let isCorrect = false;
+
+    if (selected !== null) {
+
+      // ✅ SHORT
+      if (q.type === "short") {
+        const normalize = (str) =>
+          str.trim().toLowerCase().replace(/\s+/g, "");
+
+        isCorrect = normalize(selected) === normalize(q.answer);
+      }
+
+      // ✅ MULTI
+      else if (q.type === "multi") {
+        const userArr = JSON.parse(selected);
+        const correctArr = q.answer;
+
+        isCorrect =
+          userArr.length === correctArr.length &&
+          userArr.every(v => correctArr.includes(v));
+      }
+
+      // ✅ RADIO
+      else {
+        isCorrect = parseInt(selected) === q.answer;
+      }
+
+      if (isCorrect) {
+        score++;
+      } else {
+        wrongAnswers.push(`Câu ${index + 1}`);
+      }
+
+    } else {
+      // ❗ CHƯA LÀM → cũng tính là sai
+      wrongAnswers.push(`Câu ${index + 1}`);
+    }
+
+    // ✅ XÓA SAU MỖI CÂU
+    localStorage.removeItem("q" + index);
+  });
+
+  localStorage.setItem("done_" + studentID, "true");
+
+  // ✅ GỬI GOOGLE FORM
+  fetch("https://docs.google.com/forms/d/e/1FAIpQLSd_YK4a8Av99jA8Am5yOBx1kw2Xuw2nRlMz-Mfx08GqnO_T5Q/formResponse", {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body:
+      "entry.891986647=" + studentID +
+      "&entry.156437038=" + score +
+      "&entry.1381726656=" + answers.join(",") +
+      "&entry.1312755056=" + wrongAnswers.join(", ")
+  });
+
+  alert("🎉 Chúc mừng bạn đã hoàn thành bài thi!");
+  window.location.href = "index.html";
+};
+
+// particles nhẹ
+tsParticles.load("particles", {
+  particles: {
+    number: { value: 20 }, // giảm luôn cho nhẹ
+    color: { value: "#3b82f6" },
+    size: { value: 2 },
+
+    move: { enable: false }, // ❌ tắt chuyển động
+    links: { enable: false } // ❌ tắt nối dây
+  }
+});
+  // tổng thời gian (5 phút)
+const TOTAL_TIME = 5400;
+
+// lấy thời điểm bắt đầu (lưu lại)
+const key = "startTime_" + studentID;
+
+let startTime = localStorage.getItem(key);
+
+if (!startTime) {
+  startTime = Date.now();
+  localStorage.setItem(key, startTime);
+}
+const timerEl = document.getElementById("timer");
+
+const countdown = setInterval(() => {
+  const now = Date.now();
+  const elapsed = Math.floor((now - startTime) / 1000);
+  let timeLeft = TOTAL_TIME - elapsed;
+
+  if (timeLeft < 0) timeLeft = 0;
+
+  let minutes = Math.floor(timeLeft / 60);
+  let seconds = timeLeft % 60;
+
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  seconds = seconds < 10 ? "0" + seconds : seconds;
+
+  timerEl.innerText = minutes + ":" + seconds;
+
+  // 🔴 đổi màu khi còn < 60s
+  if (timeLeft <= 60) {
+    timerEl.classList.add("timer-danger");
+  }
+
+  // hết giờ
+  if (timeLeft === 0) {
+    clearInterval(countdown);
+    alert("Hết giờ!");
+    localStorage.removeItem("startTime_" + studentID); // reset cho lần sau
+    submitTest();
+  }
+
+}, 1000);
+  // chặn copy
+document.addEventListener("copy", e => {
+  e.preventDefault();
+});
+
+// chặn paste
+document.addEventListener("paste", e => {
+  e.preventDefault();
+});
+
+// chặn cut
+document.addEventListener("cut", e => {
+  e.preventDefault();
+});
+
+// chặn chuột phải
+document.addEventListener("contextmenu", e => {
+  e.preventDefault();
+});
+
+// chặn phím
+document.addEventListener("keydown", e => {
+  if (
+    (e.ctrlKey && ["c","v","u","s"].includes(e.key.toLowerCase())) ||
+    e.key === "F12"
+  ) {
+    e.preventDefault();
+  }
+});
+  const toggleBtn = document.getElementById("toggleNav");
+const nav = document.getElementById("questionNav");
+
+toggleBtn.onclick = () => {
+  nav.classList.toggle("open");
+};
+</script>
+
+</body>
+</html>
