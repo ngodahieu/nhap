@@ -193,6 +193,42 @@
   background: #22c55e; /* xanh lá */
   color: white;
 }
+  /* 🔥 LAYOUT 2 CỘT */
+.exam-wrapper {
+  display: flex;
+  gap: 20px;
+}
+
+/* 📄 TƯ LIỆU */
+.passage-box {
+  width: 40%;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 15px;
+  border: 2px solid #3b82f6;
+}
+
+/* ❓ CÂU HỎI */
+.question-box {
+  width: 60%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* 📱 MOBILE → quay lại 1 cột */
+@media (max-width: 768px) {
+  .exam-wrapper {
+    flex-direction: column;
+  }
+
+  .passage-box,
+  .question-box {
+    width: 100%;
+    max-height: none;
+  }
+}
     @keyframes fadeIn {
       from {opacity: 0; transform: translateY(20px);}
       to {opacity: 1; transform: translateY(0);}
@@ -212,12 +248,13 @@
 <div class="container">
 
   <h2 id="welcome"></h2>
-  
 
-  <div id="quiz"></div>
+  <div class="exam-wrapper">
+    <div id="passageArea" class="passage-box"></div>
+    <div id="quiz" class="question-box"></div>
+  </div>
 
   <button onclick="submitTest()">Nộp bài</button>
-
   <div id="result"></div>
 
 </div>
@@ -569,11 +606,17 @@ const quizDiv = document.getElementById("quiz");
 
 questions.forEach((group, groupIndex) => {
 
-  if (group.passage) {
-    const passageDiv = document.createElement("div");
-    passageDiv.innerHTML = `<p><b>📄 Tư liệu:</b> ${group.passage}</p><hr>`;
-    quizDiv.appendChild(passageDiv);
-  }
+const passageArea = document.getElementById("passageArea");
+
+if (group.passage) {
+  const passageDiv = document.createElement("div");
+  passageDiv.innerHTML = `
+    <p><b>📄 Tư liệu:</b></p>
+    ${group.passage}
+    <hr>
+  `;
+  passageArea.appendChild(passageDiv);
+}
   // 🔥 XÁO TRỘN CÂU TRONG GROUP
 const shuffledQuestions = shuffleWithSeed(group.questions, seed + groupIndex);
 
