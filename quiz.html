@@ -694,6 +694,7 @@ else {
   createQuestionNav(); // ✅ đúng vị trí
   updateProgress();
   // 🔥 THÊM Ở ĐÂY
+  const passageArea = document.getElementById("passageArea");
 passageArea.innerHTML = passageMap[0]
   ? `<b>📄 Tư liệu:</b><br>${passageMap[0]}`
   : "<i>Không có tư liệu</i>";
