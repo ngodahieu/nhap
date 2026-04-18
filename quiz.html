@@ -893,18 +893,24 @@ const countdown = setInterval(() => {
 
 }, 1000);
 
-window.addEventListener("scroll", () => {
+quizDiv.addEventListener("scroll", () => {
   const questions = document.querySelectorAll(".question");
 
   let currentIndex = 0;
 
   questions.forEach((q, index) => {
     const rect = q.getBoundingClientRect();
+    const parentRect = quizDiv.getBoundingClientRect();
 
-    if (rect.top < window.innerHeight / 2) {
+    if (rect.top < parentRect.top + parentRect.height / 2) {
       currentIndex = index;
     }
   });
+
+  passageArea.innerHTML = passageMap[currentIndex]
+    ? `<b>📄 Tư liệu:</b><br>${passageMap[currentIndex]}`
+    : "<i>Không có tư liệu</i>";
+});
 
   passageArea.innerHTML = passageMap[currentIndex]
     ? `<b>📄 Tư liệu:</b><br>${passageMap[currentIndex]}`
